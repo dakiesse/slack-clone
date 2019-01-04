@@ -2,8 +2,11 @@ import React, { Component } from 'react'
 import { Button, Form, Grid, Header, Icon, Message, Segment } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import firebase from '../../firebase'
+import md5 from 'md5'
 
 export default class Register extends Component {
+  dbUserRef = firebase.database().ref('users')
+
   state = {
     username: '123',
     email: 'dakiesse@gmail.com',
@@ -50,7 +53,7 @@ export default class Register extends Component {
   }
 
   handleSubmit = async (e) => {
-    const { email, password } = this.state
+    const { username, email, password } = this.state
 
     e.preventDefault()
 
@@ -60,12 +63,27 @@ export default class Register extends Component {
 
     try {
       const createdUser = await firebase.auth().createUserWithEmailAndPassword(email, password)
-      console.log(createdUser)
+
+      await createdUser.user.updateProfile({
+        displayName: username,
+        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
+      })
+
+      this.saveUser(createdUser)
     } catch (e) {
       this.setState({ errors: [{ message: e.message }] })
     } finally {
       this.setState({ loading: false })
     }
+  }
+
+  saveUser = (createdUser) => {
+    const user = createdUser.user
+
+    this.dbUserRef.child(user.uid).set({
+      name: user.displayName,
+      avatar: user.photoURL,
+    })
   }
 
   renderInput = ({ type = 'text', name, placeholder, icon }) => {
