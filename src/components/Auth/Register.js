@@ -5,11 +5,12 @@ import firebase from '../../firebase'
 
 export default class Register extends Component {
   state = {
-    username: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
+    username: '123',
+    email: 'dakiesse@gmail.com',
+    password: '111111',
+    passwordConfirmation: '111111',
     errors: [],
+    loading: false,
   }
 
   isFormValid = () => {
@@ -55,28 +56,36 @@ export default class Register extends Component {
 
     if (!this.isFormValid()) return false
 
+    this.setState({ loading: true })
+
     try {
       const createdUser = await firebase.auth().createUserWithEmailAndPassword(email, password)
       console.log(createdUser)
     } catch (e) {
-      console.error(e)
+      this.setState({ errors: [{ message: e.message }] })
+    } finally {
+      this.setState({ loading: false })
     }
   }
 
   renderInput = ({ type = 'text', name, placeholder, icon }) => {
+    const { errors } = this.state
+
     return (
       <Form.Input type={type}
                   name={name}
                   placeholder={placeholder}
                   icon={icon}
                   iconPosition="left"
+                  value={this.state[name]}
+                  error={errors.some(error => error.message.toLowerCase().includes(type))}
                   fluid required
                   onChange={this.handlerChange}/>
     )
   }
 
   render () {
-    const { errors } = this.state
+    const { errors, loading } = this.state
 
     return (
       <Grid className="app" textAlign="center" verticalAlign="middle">
@@ -98,7 +107,7 @@ export default class Register extends Component {
                 icon: 'repeat'
               })}
 
-              <Button color="orange" fluid size="large">Submit</Button>
+              <Button color="orange" size="large" loading={loading} disabled={loading} fluid>Submit</Button>
             </Segment>
 
             <Message error
