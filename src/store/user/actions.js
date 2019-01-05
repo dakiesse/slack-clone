@@ -7,3 +7,7 @@ export const setUser = (user) => ({
     isLoading: false,
   }
 })
+
+export const clearUser = () => ({
+  type: actionTypes.CLEAR_USER,
+})
