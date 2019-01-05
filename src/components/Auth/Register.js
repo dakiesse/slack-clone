@@ -8,10 +8,10 @@ export default class Register extends Component {
   dbUserRef = firebase.database().ref('users')
 
   state = {
-    username: '123',
-    email: 'dakiesse@gmail.com',
-    password: '111111',
-    passwordConfirmation: '111111',
+    username: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
     errors: [],
     loading: false,
   }

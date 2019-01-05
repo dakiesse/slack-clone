@@ -5,8 +5,8 @@ import firebase from '../../firebase'
 
 export default class Login extends Component {
   state = {
-    email: 'dakiesse@gmail.com',
-    password: '111111',
+    email: '',
+    password: '',
     errors: [],
     loading: false,
   }
