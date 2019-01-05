@@ -46,9 +46,7 @@ export default class Login extends Component {
     try {
       const signedInUser = await firebase.auth().signInWithEmailAndPassword(email, password)
     } catch (e) {
-      this.setState({ errors: [{ message: e.message }] })
-    } finally {
-      this.setState({ loading: false })
+      this.setState({ errors: [{ message: e.message }], loading: false })
     }
   }
 
