@@ -4,10 +4,12 @@ import firebase from '../../firebase'
 
 class UserPanel extends Component {
   get dropdownOptions () {
+    const { currentUser } = this.props
+
     return [
       {
         key: 'user',
-        text: <span>Signed in as <strong>User</strong></span>,
+        text: <span>Signed in as <strong>{currentUser.displayName}</strong></span>,
         disabled: true,
       },
       {
@@ -27,6 +29,8 @@ class UserPanel extends Component {
   }
 
   render () {
+    const { currentUser } = this.props
+
     return (
       <Grid style={{ background: '#4c3c4c' }}>
         <Grid.Column>
@@ -39,7 +43,7 @@ class UserPanel extends Component {
 
           <Header as="h4" inverted style={{ padding: '.25em' }}>
             <Dropdown trigger={
-              <span>User</span>
+              <span>{currentUser.displayName}</span>
             } options={this.dropdownOptions}/>
           </Header>
         </Grid.Column>

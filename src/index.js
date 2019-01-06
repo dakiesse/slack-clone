@@ -19,12 +19,17 @@ const store = createStore(rootReducer, composeWithDevTools())
 class Root extends React.Component {
   componentDidMount () {
     firebase.auth().onAuthStateChanged((user) => {
+      const { history, location, setUser, clearUser } = this.props
+
       if (user) {
-        this.props.setUser(user)
-        this.props.history.push('/')
+        setUser(user)
+
+        if (['login', 'register'].includes(location.pathname.slice(1))) {
+          history.push('/')
+        }
       } else {
-        this.props.history.push('/login')
-        this.props.clearUser()
+        history.push('/login')
+        clearUser()
       }
     })
   }
@@ -41,6 +46,7 @@ class Root extends React.Component {
           <Route exact path="/" component={App}/>
           <Route path="/login" component={Login}/>
           <Route path="/register" component={Register}/>
+          <Route component={() => (<div>Not Found</div>)}/>
         </Switch>
       )
   }
