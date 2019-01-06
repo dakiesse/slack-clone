@@ -6,9 +6,14 @@ class Channels extends Component {
   dbChannelRef = firebase.database().ref('channels')
 
   state = {
+    channels: [],
     newChannelName: '',
     newChannelDetails: '',
     isOpeningModal: false,
+  }
+
+  componentDidMount () {
+    this.addDbListeners()
   }
 
   handlerCreateChannel = () => {
@@ -19,6 +24,15 @@ class Channels extends Component {
 
   handlerChange = ({ target: { name, value } }) => {
     this.setState({ [name]: value })
+  }
+
+  addDbListeners = () => {
+    const loadedChannels = []
+
+    this.dbChannelRef.on('child_added', (snap) => {
+      loadedChannels.push(snap.val())
+      this.setState({ channels: loadedChannels })
+    })
   }
 
   addChannel = async () => {
@@ -97,6 +111,17 @@ class Channels extends Component {
     )
   }
 
+  renderChannels () {
+    return this.state.channels.map((channel) => (
+      <Menu.Item
+        key={channel.id}
+        name={channel.name}
+        style={{ opacity: .7 }}>
+        # {channel.name}
+      </Menu.Item>
+    ))
+  }
+
   render () {
     return (
       <React.Fragment>
@@ -104,6 +129,8 @@ class Channels extends Component {
           <Menu.Item>
             <span><Icon name="exchange"/> CHANNELS</span> ({0}) <Icon name="add" onClick={this.openModal}/>
           </Menu.Item>
+
+          {this.renderChannels()}
         </Menu.Menu>
 
         {this.renderModal()}
