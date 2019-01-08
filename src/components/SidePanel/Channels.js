@@ -19,6 +19,10 @@ class Channels extends Component {
     this.addDbListeners()
   }
 
+  componentWillUnmount () {
+    this.removeListeners()
+  }
+
   handlerCreateChannel = () => {
     if (this.isFormValid()) {
       this.addChannel()
@@ -36,6 +40,10 @@ class Channels extends Component {
       loadedChannels.push(snap.val())
       this.setState({ channels: loadedChannels }, this.setFirstChannel)
     })
+  }
+
+  removeListeners = () => {
+    this.dbChannelRef.off()
   }
 
   addChannel = async () => {
