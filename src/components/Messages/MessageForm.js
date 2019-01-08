@@ -1,0 +1,24 @@
+import React, { Component } from 'react'
+import { Button, Input, Segment } from 'semantic-ui-react'
+
+class MessageForm extends Component {
+  render () {
+    return (
+      <Segment className="message__form">
+        <Input name="message"
+               label={<Button icon="add"/>}
+               labelPosition="left"
+               placeholder="Write your message"
+               fluid
+               style={{ marginBottom: '.7em' }}/>
+
+        <Button.Group icon widths="2">
+          <Button color="orange" content="Add Reply" labelPosition="left" icon="edit"/>
+          <Button color="teal" content="Upload Media" labelPosition="right" icon="cloud upload"/>
+        </Button.Group>
+      </Segment>
+    )
+  }
+}
+
+export default MessageForm
