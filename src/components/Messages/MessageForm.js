@@ -43,22 +43,38 @@ class MessageForm extends Component {
   }
 
   render () {
-    const { errors } = this.state
+    const { errors, message, isLoading } = this.state
 
     return (
       <Segment className="message__form">
-        <Input name="message"
-               label={<Button icon="add"/>}
-               labelPosition="left"
-               placeholder="Write your message"
-               error={errors.length > 0}
-               fluid
-               style={{ marginBottom: '.7em' }}
-               onChange={this.handleChange}/>
+        <Input
+          name="message"
+          label={<Button icon="add"/>}
+          labelPosition="left"
+          placeholder="Write your message"
+          error={errors.length > 0}
+          value={message}
+          fluid
+          style={{ marginBottom: '.7em' }}
+          onChange={this.handleChange}
+        />
 
         <Button.Group icon widths="2">
-          <Button color="orange" content="Add Reply" labelPosition="left" icon="edit" onClick={this.sendMessage}/>
-          <Button color="teal" content="Upload Media" labelPosition="right" icon="cloud upload"/>
+          <Button
+            color="orange"
+            content="Add Reply"
+            labelPosition="left"
+            icon="edit"
+            disabled={isLoading}
+            onClick={this.sendMessage}
+          />
+
+          <Button
+            color="teal"
+            content="Upload Media"
+            labelPosition="right"
+            icon="cloud upload"
+          />
         </Button.Group>
       </Segment>
     )
