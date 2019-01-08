@@ -12,6 +12,7 @@ class Channels extends Component {
     newChannelName: '',
     newChannelDetails: '',
     isOpeningModal: false,
+    firstLoad: true,
   }
 
   componentDidMount () {
@@ -33,7 +34,7 @@ class Channels extends Component {
 
     this.dbChannelRef.on('child_added', (snap) => {
       loadedChannels.push(snap.val())
-      this.setState({ channels: loadedChannels })
+      this.setState({ channels: loadedChannels }, this.setFirstChannel)
     })
   }
 
@@ -59,6 +60,18 @@ class Channels extends Component {
 
   setCurrentChannel = (channel) => {
     this.props.setCurrentChannel(channel)
+  }
+
+  setFirstChannel = () => {
+    const { firstLoad, channels } = this.state
+    const { setCurrentChannel } = this.props
+    const firstChannel = channels[0]
+
+    if (firstLoad && firstChannel) {
+      setCurrentChannel(firstChannel)
+    }
+
+    this.setState({ firstLoad: false })
   }
 
   isFormValid = () => {
@@ -118,10 +131,13 @@ class Channels extends Component {
   }
 
   renderChannels () {
+    const { currentChannel } = this.props.channel
+
     return this.state.channels.map((channel) => (
       <Menu.Item
         key={channel.id}
         name={channel.name}
+        active={currentChannel && channel.id === currentChannel.id}
         style={{ opacity: .7 }}
         onClick={() => this.setCurrentChannel(channel)}>
         # {channel.name}
@@ -147,6 +163,6 @@ class Channels extends Component {
 }
 
 export default connect(
-  null,
+  ({ channel }) => ({ channel }),
   { setCurrentChannel },
 )(Channels)
