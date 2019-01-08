@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Form, Icon, Input, Menu, Modal } from 'semantic-ui-react'
 import firebase from '../../firebase'
+import { connect } from 'react-redux'
+import { setCurrentChannel } from '../../store/channel/actions'
 
 class Channels extends Component {
   dbChannelRef = firebase.database().ref('channels')
@@ -53,6 +55,10 @@ class Channels extends Component {
 
     await this.dbChannelRef.child(key).update(newChannel)
     this.closeModal()
+  }
+
+  setCurrentChannel = (channel) => {
+    this.props.setCurrentChannel(channel)
   }
 
   isFormValid = () => {
@@ -116,7 +122,8 @@ class Channels extends Component {
       <Menu.Item
         key={channel.id}
         name={channel.name}
-        style={{ opacity: .7 }}>
+        style={{ opacity: .7 }}
+        onClick={() => this.setCurrentChannel(channel)}>
         # {channel.name}
       </Menu.Item>
     ))
@@ -139,4 +146,7 @@ class Channels extends Component {
   }
 }
 
-export default Channels
+export default connect(
+  null,
+  { setCurrentChannel },
+)(Channels)
