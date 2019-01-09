@@ -11,7 +11,7 @@ class Channels extends Component {
     channels: [],
     newChannelName: '',
     newChannelDetails: '',
-    isOpeningModal: false,
+    isModalOpened: false,
     firstLoad: true,
   }
 
@@ -89,18 +89,18 @@ class Channels extends Component {
   }
 
   openModal = () => {
-    this.setState({ isOpeningModal: true })
+    this.setState({ isModalOpened: true })
   }
 
   closeModal = () => {
-    this.setState({ isOpeningModal: false, newChannelName: '', newChannelDetails: '' })
+    this.setState({ isModalOpened: false, newChannelName: '', newChannelDetails: '' })
   }
 
   renderModal () {
-    const { isOpeningModal } = this.state
+    const { isModalOpened } = this.state
 
     return (
-      <Modal open={isOpeningModal} onClose={this.closeModal} basic>
+      <Modal open={isModalOpened} onClose={this.closeModal} basic>
         <Modal.Header>Add a Channel</Modal.Header>
 
         <Modal.Content>
