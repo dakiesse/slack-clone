@@ -2,13 +2,19 @@ import React, { Component } from 'react'
 import { Button, Input, Segment } from 'semantic-ui-react'
 import firebase from '../../firebase'
 import FileModal from './FileModal'
+import uuidv4 from 'uuid/v4'
 
 class MessageForm extends Component {
+  dbStorageRef = firebase.storage().ref()
+
   state = {
     message: '',
     isLoading: false,
     errors: [],
     isModalOpened: false,
+    uploadState: '',
+    uploadTask: null,
+    percentUploaded: 0,
   }
 
   handleChange = ({ target: { name, value } }) => {
@@ -41,19 +47,69 @@ class MessageForm extends Component {
     this.setState({ isModalOpened: false })
   }
 
-  createMessage () {
+  createMessage (fileUrl = null) {
     const { uid: id, displayName: name, photoURL: avatar } = this.props.currentUser
-    const { message } = this.state
+    const { message: content } = this.state
 
-    return {
-      content: message,
+    const message = {
       user: { id, name, avatar },
       timestamp: firebase.database.ServerValue.TIMESTAMP,
     }
+
+    if (fileUrl !== null) {
+      message.image = fileUrl
+    } else {
+      message.content = content
+    }
+
+    return message
   }
 
-  uploadFile (file, metadata) {
+  uploadFile = (file, metadata) => {
+    const { currentChannel } = this.props
+    const { errors } = this.state
 
+    const pathToUpload = currentChannel.id
+    const filePath = `chat/public${uuidv4()}.jpg`
+
+    const uploadTask = this.dbStorageRef.child(filePath).put(file, metadata)
+
+    this.setState({
+      uploadState: 'uploading',
+    }, () => {
+      uploadTask.on('state_changed',
+        (snap) => {
+          const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) / 100)
+          this.setState({ percentUploaded })
+        },
+        (err) => {
+          console.error(err)
+
+          this.setState({
+            errors: errors.concat(err),
+            uploadState: 'error',
+          })
+        },
+        async () => {
+          try {
+            const downloadUrl = await uploadTask.snapshot.ref.getDownloadURL()
+            this.sendFileMessage(downloadUrl, pathToUpload)
+          } catch (err) {
+            console.error(err)
+
+            this.setState({
+              errors: errors.concat(err),
+              uploadState: 'error',
+            })
+          }
+        })
+    })
+  }
+
+  async sendFileMessage (fileUrl, pathToUpload) {
+    const message = this.createMessage(fileUrl)
+    await this.props.dbMessagesRef.child(pathToUpload).push().set(message)
+    this.setState({ uploadedState: 'done' })
   }
 
   render () {

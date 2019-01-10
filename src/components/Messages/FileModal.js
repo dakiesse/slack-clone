@@ -4,7 +4,7 @@ import mime from 'mime-types'
 import { Button, Icon, Input, Modal } from 'semantic-ui-react'
 
 class FileModal extends Component {
-  static availableMimeTypes = ['image/jpg', 'image/png']
+  static availableMimeTypes = ['image/jpg', 'image/jpeg', 'image/png']
 
   state = {
     file: null,
