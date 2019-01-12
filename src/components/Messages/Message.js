@@ -18,7 +18,6 @@ class Message extends Component {
   updateRenderTime () {
     const diff = Date.now() - this.props.message.timestamp
     const delay = diff > 60000 ? 60000 : eachMilliseconds
-    console.log({ diff, delay })
 
     this.timeoutId = setTimeout(() => {
       this.forceUpdate()
