@@ -13,6 +13,7 @@ import { rootReducer } from './store/rootReducer'
 import { connect, Provider } from 'react-redux'
 import { clearUser, setUser } from './store/user/actions'
 import Spinner from './components/Spinner'
+import './configs/moment'
 
 const store = createStore(rootReducer, composeWithDevTools())
 
