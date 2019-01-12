@@ -38,6 +38,18 @@ class Message extends Component {
     return message.hasOwnProperty('image') && !message.hasOwnProperty('content')
   }
 
+  getContent (message) {
+    if (message.edited) {
+      return (
+        <React.Fragment>
+          {message.content} <span className="message__edited-mark">(edited)</span>
+        </React.Fragment>
+      )
+    }
+
+    return message.content
+  }
+
   render () {
     const { message, user } = this.props
 
@@ -49,7 +61,7 @@ class Message extends Component {
           <Comment.Metadata>{this.timeFromNow(message.timestamp)}</Comment.Metadata>
           {this.isImage(message)
             ? <Image className="message__image" src={message.image}/>
-            : <Comment.Text>{message.content}</Comment.Text>}
+            : <Comment.Text>{this.getContent(message)}</Comment.Text>}
         </Comment.Content>
       </Comment>
     )
