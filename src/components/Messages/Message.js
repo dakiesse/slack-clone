@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Comment, Image } from 'semantic-ui-react'
 import moment from 'moment'
+import PropTypes from 'prop-types'
 
 const eachMilliseconds = 1000
 
@@ -53,6 +54,11 @@ class Message extends Component {
       </Comment>
     )
   }
+}
+
+Message.propTypes = {
+  message: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
 }
 
 export default Message
