@@ -11,7 +11,7 @@ class MessageHeader extends Component {
   }
 
   render () {
-    const { channelName } = this.props
+    const { channelName, onSearchChange, searchLoading } = this.props
 
     return (
       <Segment clearing>
@@ -24,10 +24,14 @@ class MessageHeader extends Component {
 
         {/* Channel Search Input */}
         <Header floated="right">
-          <Input size="mini"
-                 icon="search"
-                 name="searchTerm"
-                 placeholder="Search Messages"/>
+          <Input
+            size="mini"
+            icon="search"
+            name="searchTerm"
+            placeholder="Search Messages"
+            loading={searchLoading}
+            onChange={onSearchChange}
+          />
         </Header>
       </Segment>
     )
@@ -37,6 +41,8 @@ class MessageHeader extends Component {
 MessageHeader.propTypes = {
   channelName: PropTypes.string.isRequired,
   countUniqueUsers: PropTypes.number.isRequired,
+  searchLoading: PropTypes.bool.isRequired,
+  onSearchChange: PropTypes.func.isRequired,
 }
 
 export default MessageHeader

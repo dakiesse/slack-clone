@@ -12,6 +12,9 @@ class Messages extends Component {
   state = {
     messages: [],
     messagesLoading: true,
+    searchTerm: '',
+    searchLoading: false,
+    searchResults: [],
   }
 
   componentDidMount () {
@@ -89,6 +92,31 @@ class Messages extends Component {
     })
   }
 
+  handleSearchChange = (e) => {
+    this.setState(
+      { searchTerm: e.target.value, searchLoading: true },
+      this.handleSearchMessages
+    )
+  }
+
+  handleSearchMessages () {
+    const { messages, searchTerm } = this.state
+
+    const regex = new RegExp(searchTerm, 'gi')
+    const searchResults = messages.reduce((acc, message) => {
+      const { content, user } = message
+
+      if (content && (content.match(regex) || user.name.match(regex))) {
+        acc.push(message)
+      }
+
+      return acc
+    }, [])
+
+    this.setState({ searchResults })
+    setTimeout(() => this.setState({ searchLoading: false }), 1000)
+  }
+
   getCountUniqueUsers () {
     return this.state.messages.reduce((acc, message) => {
       if (!acc.includes(message.user.name)) {
@@ -105,8 +133,11 @@ class Messages extends Component {
 
   renderMessages () {
     const { currentUser } = this.props
+    const { messages, searchTerm, searchResults } = this.state
 
-    return this.state.messages.map((message) => (
+    const source = searchTerm ? searchResults : messages
+
+    return source.map((message) => (
       <Message
         key={message.timestamp}
         message={message}
@@ -117,12 +148,15 @@ class Messages extends Component {
 
   render () {
     const { currentUser, currentChannel } = this.props
+    const { searchLoading } = this.state
 
     return (
       <React.Fragment>
         <MessageHeader
           channelName={currentChannel.name}
           countUniqueUsers={this.getCountUniqueUsers()}
+          searchLoading={searchLoading}
+          onSearchChange={this.handleSearchChange}
         />
 
         <Segment>

@@ -33,7 +33,7 @@ class MessageForm extends Component {
     this.setState({ isLoading: true })
 
     try {
-      await dbMessagesRef.child(currentChannel.id).push().set(this.createMessage())
+      await dbMessagesRef.child(currentChannel.id).push(this.createMessage())
       this.setState({ isLoading: false, message: '', errors: [] })
     } catch (e) {
       this.setState({ isLoading: false, errors: [e] })
