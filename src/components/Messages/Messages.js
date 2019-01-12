@@ -6,6 +6,7 @@ import firebase from '../../firebase'
 import Message from './Message'
 
 class Messages extends Component {
+  messagesRef = React.createRef()
   dbMessagesRef = firebase.database().ref('messages')
 
   state = {
@@ -25,6 +26,10 @@ class Messages extends Component {
     this.removeListeners()
   }
 
+  componentDidUpdate () {
+    this.scrollToBottom()
+  }
+
   addListeners = (channelId) => {
     this.addMessageListener(channelId)
   }
@@ -35,28 +40,39 @@ class Messages extends Component {
 
   addMessageListener = (channelId) => {
     let { messages } = this.state
+    /* eslint-disable no-unused-vars */
+    let ignoredKeyAfterAdding = null
 
     this.dbMessagesRef.child(channelId).once('value', (snapshot) => {
       snapshot.forEach((childSnapshot) => {
         messages.push({ ...childSnapshot.val(), key: childSnapshot.key })
       })
 
-      const lastMessage = messages[messages.length - 1]
       this.setState({ messages })
+
+      const lastMessage = messages[messages.length - 1]
+      const lastTimestamp = lastMessage ? lastMessage.timestamp + 1 : null
+
+      let ignoredKeyAfterAdding = null
 
       this.dbMessagesRef
         .child(channelId)
         .orderByChild('timestamp')
-        .startAt(lastMessage.timestamp + 1)
+        .startAt(lastTimestamp)
         .on('child_added', (snap) => {
           const message = snap.val()
-          message.key = snap.key
+          message.key = ignoredKeyAfterAdding = snap.key
           messages.push(message)
 
           this.setState({ messages, messagesLoading: false })
         })
 
       this.dbMessagesRef.child(channelId).on('child_changed', (snap) => {
+        if (snap.key === ignoredKeyAfterAdding) {
+          ignoredKeyAfterAdding = null
+          return
+        }
+
         const changedMessage = snap.val()
         const index = messages.findIndex(message => message.key === snap.key)
         messages[index] = { ...changedMessage, key: snap.key, edited: true }
@@ -83,6 +99,10 @@ class Messages extends Component {
     }, []).length
   }
 
+  scrollToBottom () {
+    this.messagesRef.current.scrollTop = this.messagesRef.current.scrollHeight
+  }
+
   renderMessages () {
     const { currentUser } = this.props
 
@@ -106,8 +126,10 @@ class Messages extends Component {
         />
 
         <Segment>
-          <Comment.Group className="messages">
-            {this.renderMessages()}
+          <Comment.Group>
+            <div className="messages" ref={this.messagesRef}>
+              {this.renderMessages()}
+            </div>
           </Comment.Group>
         </Segment>
 
