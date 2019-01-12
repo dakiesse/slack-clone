@@ -110,7 +110,7 @@ class MessageForm extends Component {
   async sendFileMessage (fileUrl, pathToUpload) {
     const message = this.createMessage(fileUrl)
     await this.props.dbMessagesRef.child(pathToUpload).push().set(message)
-    this.setState({ uploadedState: 'done' })
+    this.setState({ uploadState: 'done' })
   }
 
   render () {
