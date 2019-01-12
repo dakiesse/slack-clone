@@ -36,28 +36,40 @@ class Messages extends Component {
   addMessageListener = (channelId) => {
     let { messages } = this.state
 
-    this.dbMessagesRef.child(channelId).on('child_added', (snap) => {
-      const message = snap.val()
-      message.key = snap.key
-      messages.push(message)
+    this.dbMessagesRef.child(channelId).once('value', (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        messages.push({ ...childSnapshot.val(), key: childSnapshot.key })
+      })
 
-      this.setState({ messages, messagesLoading: false })
-    })
-
-    this.dbMessagesRef.child(channelId).on('child_changed', (snap) => {
-      const changedMessage = snap.val()
-      const changedKeyMessage = snap.key
-      const index = messages.findIndex(message => message.key === changedKeyMessage)
-      messages[index] = { ...changedMessage, edited: true }
-
+      const lastMessage = messages[messages.length - 1]
       this.setState({ messages })
-    })
 
-    this.dbMessagesRef.child(channelId).on('child_removed', (snap) => {
-      const deletedKeyMessage = snap.key
-      messages = messages.filter(message => message.key !== deletedKeyMessage)
+      this.dbMessagesRef
+        .child(channelId)
+        .orderByChild('timestamp')
+        .startAt(lastMessage.timestamp + 1)
+        .on('child_added', (snap) => {
+          const message = snap.val()
+          message.key = snap.key
+          messages.push(message)
 
-      this.setState({ messages })
+          this.setState({ messages, messagesLoading: false })
+        })
+
+      this.dbMessagesRef.child(channelId).on('child_changed', (snap) => {
+        const changedMessage = snap.val()
+        const index = messages.findIndex(message => message.key === snap.key)
+        messages[index] = { ...changedMessage, key: snap.key, edited: true }
+
+        this.setState({ messages })
+      })
+
+      this.dbMessagesRef.child(channelId).on('child_removed', (snap) => {
+        const deletedKeyMessage = snap.key
+        messages = messages.filter(message => message.key !== deletedKeyMessage)
+
+        this.setState({ messages })
+      })
     })
   }
 
