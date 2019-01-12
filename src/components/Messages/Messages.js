@@ -34,12 +34,30 @@ class Messages extends Component {
   }
 
   addMessageListener = (channelId) => {
-    const loadedMessages = []
+    let { messages } = this.state
 
     this.dbMessagesRef.child(channelId).on('child_added', (snap) => {
-      loadedMessages.push(snap.val())
+      const message = snap.val()
+      message.key = snap.key
+      messages.push(message)
 
-      this.setState({ messages: loadedMessages, messagesLoading: false })
+      this.setState({ messages, messagesLoading: false })
+    })
+
+    this.dbMessagesRef.child(channelId).on('child_changed', (snap) => {
+      const changedMessage = snap.val()
+      const changedKeyMessage = snap.key
+      const index = messages.findIndex(message => message.key === changedKeyMessage)
+      messages[index] = { ...changedMessage, edited: true }
+
+      this.setState({ messages })
+    })
+
+    this.dbMessagesRef.child(channelId).on('child_removed', (snap) => {
+      const deletedKeyMessage = snap.key
+      messages = messages.filter(message => message.key !== deletedKeyMessage)
+
+      this.setState({ messages })
     })
   }
 
