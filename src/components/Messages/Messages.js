@@ -43,6 +43,16 @@ class Messages extends Component {
     })
   }
 
+  getCountUniqueUsers () {
+    return this.state.messages.reduce((acc, message) => {
+      if (!acc.includes(message.user.name)) {
+        acc.push(message.user.name)
+      }
+
+      return acc
+    }, []).length
+  }
+
   renderMessages () {
     const { currentUser } = this.props
 
@@ -60,7 +70,10 @@ class Messages extends Component {
 
     return (
       <React.Fragment>
-        <MessageHeader/>
+        <MessageHeader
+          channelName={currentChannel.name}
+          countUniqueUsers={this.getCountUniqueUsers()}
+        />
 
         <Segment>
           <Comment.Group className="messages">

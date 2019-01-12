@@ -16,11 +16,13 @@ const App = ({ currentUser, currentChannel }) => (
     />
 
     <Grid.Column style={{ marginLeft: 320 }}>
-      <Messages
-        key={currentChannel && currentChannel.id}
-        currentUser={currentUser}
-        currentChannel={currentChannel}
-      />
+      {currentChannel && (
+        <Messages
+          key={currentChannel && currentChannel.id}
+          currentUser={currentUser}
+          currentChannel={currentChannel}
+        />
+      )}
     </Grid.Column>
 
     <Grid.Column width={4}>
