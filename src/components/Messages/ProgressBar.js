@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Progress } from 'semantic-ui-react'
 
 const ProgressBar = ({ uploadState, percentUploaded }) => (
@@ -13,5 +14,10 @@ const ProgressBar = ({ uploadState, percentUploaded }) => (
     />
   )
 )
+
+ProgressBar.propTypes = {
+  uploadState: PropTypes.string.isRequired,
+  percentUploaded: PropTypes.number.isRequired,
+}
 
 export default ProgressBar
