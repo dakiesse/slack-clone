@@ -7,7 +7,7 @@ import Messages from './Messages/Messages'
 import MetaPanel from './MetaPanel/MetaPanel'
 import './App.css'
 
-const App = ({ currentUser, currentChannel }) => (
+const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
   <Grid className="app" columns="equal">
     <ColorPanel/>
     <SidePanel
@@ -21,6 +21,7 @@ const App = ({ currentUser, currentChannel }) => (
           key={currentChannel && currentChannel.id}
           currentUser={currentUser}
           currentChannel={currentChannel}
+          isPrivateChannel={isPrivateChannel}
         />
       )}
     </Grid.Column>
@@ -32,5 +33,9 @@ const App = ({ currentUser, currentChannel }) => (
 )
 
 export default connect(
-  ({ user, channel }) => ({ currentUser: user.currentUser, currentChannel: channel.currentChannel })
+  ({ user, channel }) => ({
+    currentUser: user.currentUser,
+    currentChannel: channel.currentChannel,
+    isPrivateChannel: channel.isPrivateChannel,
+  })
 )(App)

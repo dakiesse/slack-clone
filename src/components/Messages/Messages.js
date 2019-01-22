@@ -8,6 +8,7 @@ import Message from './Message'
 class Messages extends Component {
   messagesRef = React.createRef()
   dbMessagesRef = firebase.database().ref('messages')
+  dbPrivateMessagesRef = firebase.database().ref('privateMessages')
 
   state = {
     messages: [],
@@ -15,6 +16,10 @@ class Messages extends Component {
     searchTerm: '',
     searchLoading: false,
     searchResults: [],
+  }
+
+  getDbMessagesRef () {
+    return this.props.isPrivateChannel ? this.dbPrivateMessagesRef : this.dbMessagesRef
   }
 
   componentDidMount () {
@@ -45,8 +50,9 @@ class Messages extends Component {
     let { messages } = this.state
     /* eslint-disable no-unused-vars */
     let ignoredKeyAfterAdding = null
+    const dbMessagesRef = this.getDbMessagesRef()
 
-    this.dbMessagesRef.child(channelId).once('value', (snapshot) => {
+    dbMessagesRef.child(channelId).once('value', (snapshot) => {
       snapshot.forEach((childSnapshot) => {
         messages.push({ ...childSnapshot.val(), key: childSnapshot.key })
       })
@@ -58,7 +64,7 @@ class Messages extends Component {
 
       let ignoredKeyAfterAdding = null
 
-      this.dbMessagesRef
+      dbMessagesRef
         .child(channelId)
         .orderByChild('timestamp')
         .startAt(lastTimestamp)
@@ -70,7 +76,7 @@ class Messages extends Component {
           this.setState({ messages, messagesLoading: false })
         })
 
-      this.dbMessagesRef.child(channelId).on('child_changed', (snap) => {
+      dbMessagesRef.child(channelId).on('child_changed', (snap) => {
         if (snap.key === ignoredKeyAfterAdding) {
           ignoredKeyAfterAdding = null
           return
@@ -83,7 +89,7 @@ class Messages extends Component {
         this.setState({ messages })
       })
 
-      this.dbMessagesRef.child(channelId).on('child_removed', (snap) => {
+      dbMessagesRef.child(channelId).on('child_removed', (snap) => {
         const deletedKeyMessage = snap.key
         messages = messages.filter(message => message.key !== deletedKeyMessage)
 
@@ -147,13 +153,14 @@ class Messages extends Component {
   }
 
   render () {
-    const { currentUser, currentChannel } = this.props
+    const { currentUser, currentChannel, isPrivateChannel } = this.props
     const { searchLoading } = this.state
 
     return (
       <React.Fragment>
         <MessageHeader
           channelName={currentChannel.name}
+          isPrivateChannel={isPrivateChannel}
           countUniqueUsers={this.getCountUniqueUsers()}
           searchLoading={searchLoading}
           onSearchChange={this.handleSearchChange}
@@ -170,7 +177,8 @@ class Messages extends Component {
         <MessageForm
           currentUser={currentUser}
           currentChannel={currentChannel}
-          dbMessagesRef={this.dbMessagesRef}
+          isPrivateChannel={isPrivateChannel}
+          dbMessagesRef={this.getDbMessagesRef()}
         />
       </React.Fragment>
     )

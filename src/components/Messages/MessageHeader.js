@@ -3,6 +3,12 @@ import PropTypes from 'prop-types'
 import { Header, Icon, Input, Segment } from 'semantic-ui-react'
 
 class MessageHeader extends Component {
+  get channelName () {
+    const { channelName, isPrivateChannel } = this.props
+
+    return `${isPrivateChannel ? '@' : '#'}${channelName}`
+  }
+
   get countUniqueUsers () {
     const { countUniqueUsers } = this.props
     const isPlural = countUniqueUsers > 1 || countUniqueUsers === 0
@@ -11,13 +17,13 @@ class MessageHeader extends Component {
   }
 
   render () {
-    const { channelName, onSearchChange, searchLoading } = this.props
+    const { isPrivateChannel, onSearchChange, searchLoading } = this.props
 
     return (
       <Segment clearing>
         <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
           <span>
-            #{channelName} <Icon name="star outline" color="black"/>
+            {this.channelName} {!isPrivateChannel && <Icon name="star outline" color="black"/>}
           </span>
           <Header.Subheader>{this.countUniqueUsers}</Header.Subheader>
         </Header>
@@ -40,6 +46,7 @@ class MessageHeader extends Component {
 
 MessageHeader.propTypes = {
   channelName: PropTypes.string.isRequired,
+  isPrivateChannel: PropTypes.bool.isRequired,
   countUniqueUsers: PropTypes.number.isRequired,
   searchLoading: PropTypes.bool.isRequired,
   onSearchChange: PropTypes.func.isRequired,

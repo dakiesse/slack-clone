@@ -66,12 +66,22 @@ class MessageForm extends Component {
     return message
   }
 
+  getPath () {
+    const { currentChannel, isPrivateChannel } = this.props
+
+    if (isPrivateChannel) {
+      return `chat/private-${currentChannel.id}`
+    }
+
+    return `chat/public`
+  }
+
   uploadFile = (file, metadata) => {
     const { currentChannel } = this.props
     const { errors } = this.state
 
     const pathToUpload = currentChannel.id
-    const filePath = `chat/public${uuidv4()}.jpg`
+    const filePath = `${this.getPath()}/${uuidv4()}.jpg`
 
     const uploadTask = this.dbStorageRef.child(filePath).put(file, metadata)
 
