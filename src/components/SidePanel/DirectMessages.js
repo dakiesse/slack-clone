@@ -93,6 +93,7 @@ class DirectMessages extends Component {
   }
 
   render () {
+    const { currentChannel } = this.props
     const { loadedUsers } = this.state
 
     return (
@@ -104,6 +105,7 @@ class DirectMessages extends Component {
         {loadedUsers.map((user) => (
           <Menu.Item
             key={user.key}
+            active={this.getChannelId(user.key) === currentChannel.id}
             onClick={() => this.changeChannel(user)}
             style={{ opacity: .7, fontStyle: 'italic' }}
           >
@@ -123,6 +125,6 @@ DirectMessages.propTypes = {
 }
 
 export default connect(
-  null,
+  ({ channel }) => ({ currentChannel: channel.currentChannel }),
   { setCurrentChannel, setPrivateChannel },
 )(DirectMessages)
